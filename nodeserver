@@ -5,7 +5,6 @@
 logs="-l /srv/server/console.log -e /srv/server/error.log -o/srv/server/out.log -a"
 timers="--spinSleepTime 1000 --minUptime 1000"
 
-
 touch /var/lock/nodeserver
 
 case "$1" in
