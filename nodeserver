@@ -1,0 +1,43 @@
+#! /bin/sh
+# /etc/init.d/nodeserver
+#
+
+logs="-l /srv/server/console.log -e /srv/server/error.log -o/srv/server/out.log -a"
+timers="--spinSleepTime 1000 --minUptime 1000"
+
+
+touch /var/lock/nodeserver
+
+case "$1" in
+  start)
+    echo "starting url-shortener-manager" &&
+    cd /srv/url-shortener-manager &&
+    NODE_ENV=live forever start $logs $timers server.js &&
+
+    echo "starting url-shortener-node" &&
+    cd /srv/url-shortener-node &&
+    NODE_ENV=live forever start $logs $timers server.js &&
+
+    echo "starting url-shortener-front" &&
+    cd /srv/url-shortener-front &&
+    NODE_ENV=production forever start $logs $timers src/server/index.js &&
+
+    echo "starting itsaves-api" &&
+    cd /srv/itsaves-api &&
+    NODE_ENV=live forever start $logs $timers server.js
+    ;;
+  stop)
+    echo "Stopping all applications"
+    forever stopall
+    ;;
+  restart)
+    echo "Restarting all applications"
+    forever restartall
+    ;;
+  *)
+    echo "Usage: /etc/init.d/nodeserver {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0
